@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import useTradingViewWidget from "@/hooks/useTradingViewWidget";
 import { cn } from "@/lib/utils";
 
@@ -13,7 +13,10 @@ interface TradingViewWidgetProps {
 }
 
 const TradingViewWidget = ({ title, scriptUrl, config, height = 600, className }: TradingViewWidgetProps) => {
-    const containerRef = useTradingViewWidget(scriptUrl, config, height);
+    // Stable config reference — prevents hook from re-running on parent re-renders
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const stableConfig = useMemo(() => config, [JSON.stringify(config)]);
+    const containerRef = useTradingViewWidget(scriptUrl, stableConfig, height);
 
     return (
         <div className="w-full">
