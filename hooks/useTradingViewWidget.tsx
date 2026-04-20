@@ -3,35 +3,28 @@ import { useEffect, useRef } from "react";
 
 const useTradingViewWidget = (scriptUrl: string, config: Record<string, unknown>, height = 600) => {
     const containerRef = useRef<HTMLDivElement | null>(null);
-    // Serialize config once so we can use it as a stable dep
-    const configStr = JSON.stringify(config);
 
     useEffect(() => {
-        const el = containerRef.current;
-        if (!el) return;
+        if (!containerRef.current) return;
+        if (containerRef.current.dataset.loaded) return;
+        containerRef.current.innerHTML = `<div class="tradingview-widget-container__widget" style="width: 100%; height: ${height}px;"></div>`;
 
-        // Already loaded — don't reload
-        if (el.dataset.loaded) return;
-
-        el.dataset.loaded = 'true';
-
-        const widgetDiv = document.createElement('div');
-        widgetDiv.className = 'tradingview-widget-container__widget';
-        widgetDiv.style.width = '100%';
-        widgetDiv.style.height = `${height}px`;
-        el.appendChild(widgetDiv);
-
-        const script = document.createElement('script');
+        const script = document.createElement("script");
         script.src = scriptUrl;
         script.async = true;
-        script.innerHTML = configStr;
-        el.appendChild(script);
+        script.innerHTML = JSON.stringify(config);
 
-        // No cleanup — TradingView manages its own iframe lifecycle
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // Empty deps — load once on mount, never reload
+        containerRef.current.appendChild(script);
+        containerRef.current.dataset.loaded = 'true';
+
+        return () => {
+            if(containerRef.current) {
+                containerRef.current.innerHTML = '';
+                delete containerRef.current.dataset.loaded;
+            }
+        }
+    }, [scriptUrl, config, height])
 
     return containerRef;
-};
-
-export default useTradingViewWidget;
+}
+export default useTradingViewWidget

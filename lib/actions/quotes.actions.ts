@@ -25,7 +25,7 @@ export async function getStockQuotes(symbols: string[]): Promise<StockQuote[]> {
             try {
                 const [quoteRes, metricsRes] = await Promise.all([
                     fetch(`${BASE_URL}/quote?symbol=${symbol}&token=${FINNHUB_API_KEY}`,
-                        { next: { revalidate: 60 } }),
+                        { cache: 'no-store' }),
                     fetch(`${BASE_URL}/stock/metric?symbol=${symbol}&metric=all&token=${FINNHUB_API_KEY}`,
                         { next: { revalidate: 3600 } }),
                 ]);
