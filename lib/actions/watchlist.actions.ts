@@ -2,7 +2,7 @@
 
 import { connectToDatabase } from '@/database/mongoose';
 import { Watchlist } from '@/database/models/watchlist.model';
-import { auth } from '@/lib/better-auth/auth';
+import { getAuth } from '@/lib/better-auth/auth';
 import { headers } from 'next/headers';
 
 // Get all watchlist symbols for a user by email (used by inngest — no request context)
@@ -25,6 +25,7 @@ export async function getWatchlistSymbolsByEmail(email: string): Promise<string[
 export async function getWatchlist(): Promise<WatchlistItem[]> {
     await connectToDatabase();
 
+    const auth = await getAuth();
     const session = await auth.api.getSession({ headers: await headers() });
     if (!session?.user) return [];
 
@@ -41,6 +42,7 @@ export async function getWatchlist(): Promise<WatchlistItem[]> {
 export async function addToWatchlist(symbol: string, company: string): Promise<{ success: boolean; message: string }> {
     await connectToDatabase();
 
+    const auth = await getAuth();
     const session = await auth.api.getSession({ headers: await headers() });
     if (!session?.user) return { success: false, message: 'Not authenticated' };
 
@@ -65,6 +67,7 @@ export async function addToWatchlist(symbol: string, company: string): Promise<{
 export async function removeFromWatchlist(symbol: string): Promise<{ success: boolean; message: string }> {
     await connectToDatabase();
 
+    const auth = await getAuth();
     const session = await auth.api.getSession({ headers: await headers() });
     if (!session?.user) return { success: false, message: 'Not authenticated' };
 
@@ -79,6 +82,7 @@ export async function removeFromWatchlist(symbol: string): Promise<{ success: bo
 export async function isInWatchlist(symbol: string): Promise<boolean> {
     await connectToDatabase();
 
+    const auth = await getAuth();
     const session = await auth.api.getSession({ headers: await headers() });
     if (!session?.user) return false;
 
