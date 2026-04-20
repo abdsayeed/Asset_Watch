@@ -396,6 +396,10 @@
   overflow: hidden !important;
 }
 
+.tradingview-widget-container * {
+  background-color: #141414 !important;
+}
+
 .tv-embed-widget-wrapper__body {
   background-color: #141414 !important;
 }
@@ -403,7 +407,13 @@
 .tradingview-widget-container__widget {
   background-color: #141414 !important;
   height: 100% !important;
+}
 
+/* Force dark on iframes before they load */
+.tradingview-widget-container iframe {
+  background-color: #141414 !important;
+  color-scheme: dark !important;
+  width: 100% !important;
 }
 
 .widget-stock-heatmap-container .screenerMapWrapper-BBVfGP0b {
