@@ -14,16 +14,20 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
         <main className="auth-layout">
             <section className="auth-left-section scrollbar-hide-default">
                 <Link href="/" className="auth-logo">
-                    <Image src="/assets/icons/logo.png" alt="AssetWatch logo" width={200} height={50} className='h-12 w-auto brightness-0 invert' />
+                    <Image src="/assets/icons/logo.png" alt="AssetWatch logo" width={300} height={80} className='h-16 w-auto brightness-0 invert' />
                 </Link>
 
                 <div className="pb-6 lg:pb-8 flex-1">{children}</div>
             </section>
 
-            <section className="auth-right-section">
-                <div className="flex-1 relative">
-                    <Image src="/assets/images/dashboard-preview-new.png" alt="Dashboard Preview" width={1440} height={1150} className="auth-dashboard-preview absolute top-0" />
-                </div>
+            <section className="auth-right-section flex items-center justify-center">
+                <Image
+                    src="/assets/icons/logo.png"
+                    alt="AssetWatch"
+                    width={500}
+                    height={200}
+                    className="w-[70%] max-w-[480px] h-auto object-contain"
+                />
             </section>
         </main>
     )

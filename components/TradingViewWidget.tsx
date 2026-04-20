@@ -26,8 +26,8 @@ const TradingViewWidget = ({ title, scriptUrl, config, height = 600, className }
             >
                 {/* Placeholder skeleton */}
                 <div
-                    className="tradingview-widget-container__widget animate-pulse bg-gray-800 rounded-lg"
-                    style={{ height, width: '100%' }}
+                    className="tradingview-widget-container__widget rounded-lg"
+                    style={{ height, width: '100%', backgroundColor: '#141414' }}
                 />
             </div>
         </div>
