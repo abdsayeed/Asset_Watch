@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { Star } from 'lucide-react';
+import { Star, RefreshCw } from 'lucide-react';
 import { removeFromWatchlist } from '@/lib/actions/watchlist.actions';
 import { toast } from 'sonner';
 import SearchCommand from '@/components/SearchCommand';
@@ -22,30 +22,70 @@ interface Props {
     initialStocks: StockWithWatchlistStatus[];
 }
 
-function formatPrice(v: number | null) {
+type LiveQuote = {
+    symbol: string;
+    price: number | null;
+    change: number | null;
+    changePercent: number | null;
+};
+
+function fmt(v: number | null, prefix = '') {
     if (v === null) return '—';
-    return `$${v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    return `${prefix}${v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
 function formatMarketCap(v: number | null) {
     if (v === null) return '—';
-    // Finnhub returns market cap in millions
     if (v >= 1_000_000) return `$${(v / 1_000_000).toFixed(2)}T`;
     if (v >= 1_000) return `$${(v / 1_000).toFixed(2)}B`;
     return `$${v.toFixed(0)}M`;
 }
 
-function formatPE(v: number | null) {
-    if (v === null) return '—';
-    return v.toFixed(1);
-}
+const POLL_INTERVAL = 15_000; // 15 seconds
 
-export default function WatchlistTable({ watchlist: initial, quotes, initialStocks }: Props) {
+export default function WatchlistTable({ watchlist: initial, quotes: initialQuotes, initialStocks }: Props) {
     const [watchlist, setWatchlist] = useState(initial);
     const [alertTarget, setAlertTarget] = useState<{ symbol: string; company: string } | null>(null);
+    const [liveQuotes, setLiveQuotes] = useState<Map<string, LiveQuote>>(
+        new Map(initialQuotes.map(q => [q.symbol, q]))
+    );
+    const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+    const [refreshing, setRefreshing] = useState(false);
     const [, startTransition] = useTransition();
 
-    const quoteMap = new Map(quotes.map(q => [q.symbol, q]));
+    // Static data (market cap, P/E) from server — doesn't need live polling
+    const staticMap = new Map(initialQuotes.map(q => [q.symbol, q]));
+
+    const fetchLiveQuotes = useCallback(async (symbols: string[]) => {
+        if (symbols.length === 0) return;
+        try {
+            setRefreshing(true);
+            const res = await fetch(`/api/quotes?symbols=${symbols.join(',')}`, { cache: 'no-store' });
+            if (!res.ok) return;
+            const data: LiveQuote[] = await res.json();
+            setLiveQuotes(new Map(data.map(q => [q.symbol, q])));
+            setLastUpdated(new Date());
+        } catch {
+            // silently fail — keep showing last known data
+        } finally {
+            setRefreshing(false);
+        }
+    }, []);
+
+    // Poll every 15 seconds
+    useEffect(() => {
+        const symbols = watchlist.map(w => w.symbol);
+        if (symbols.length === 0) return;
+
+        // Fetch immediately on mount
+        fetchLiveQuotes(symbols);
+
+        const interval = setInterval(() => {
+            fetchLiveQuotes(symbols);
+        }, POLL_INTERVAL);
+
+        return () => clearInterval(interval);
+    }, [watchlist, fetchLiveQuotes]);
 
     const handleRemove = (symbol: string) => {
         startTransition(async () => {
@@ -64,7 +104,17 @@ export default function WatchlistTable({ watchlist: initial, quotes, initialStoc
             <div className="bg-gray-800 border border-gray-600 rounded-xl overflow-hidden">
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-600">
-                    <h2 className="text-xl font-bold text-gray-100">Watchlist</h2>
+                    <div className="flex items-center gap-3">
+                        <h2 className="text-xl font-bold text-gray-100">Watchlist</h2>
+                        {watchlist.length > 0 && (
+                            <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                                <RefreshCw className={`h-3 w-3 ${refreshing ? 'animate-spin text-yellow-400' : ''}`} />
+                                <span>
+                                    {refreshing ? 'Updating...' : `Updated ${lastUpdated.toLocaleTimeString()}`}
+                                </span>
+                            </div>
+                        )}
+                    </div>
                     <SearchCommand renderAs="button" label="Add Stock" initialStocks={initialStocks} />
                 </div>
 
@@ -92,11 +142,12 @@ export default function WatchlistTable({ watchlist: initial, quotes, initialStoc
                             </thead>
                             <tbody>
                                 {watchlist.map((item) => {
-                                    const q = quoteMap.get(item.symbol);
-                                    const isPositive = (q?.changePercent ?? 0) >= 0;
+                                    const live = liveQuotes.get(item.symbol);
+                                    const stat = staticMap.get(item.symbol);
+                                    const isPositive = (live?.changePercent ?? 0) >= 0;
+
                                     return (
                                         <tr key={item.symbol} className="border-b border-gray-700 hover:bg-gray-700/30 transition-colors">
-                                            {/* Star */}
                                             <td className="px-4 py-3">
                                                 <button
                                                     onClick={() => handleRemove(item.symbol)}
@@ -106,33 +157,34 @@ export default function WatchlistTable({ watchlist: initial, quotes, initialStoc
                                                     <Star className="h-4 w-4 fill-yellow-400" />
                                                 </button>
                                             </td>
-                                            {/* Company */}
                                             <td className="px-2 py-3">
                                                 <Link href={`/stocks/${item.symbol}`} className="text-gray-200 hover:text-yellow-400 transition-colors font-medium">
                                                     {item.company}
                                                 </Link>
                                             </td>
-                                            {/* Symbol */}
                                             <td className="px-4 py-3 text-gray-400 font-mono">{item.symbol}</td>
-                                            {/* Price */}
-                                            <td className="px-4 py-3 text-right text-gray-100 font-medium">
-                                                {formatPrice(q?.price ?? null)}
+                                            {/* Live price */}
+                                            <td className="px-4 py-3 text-right text-gray-100 font-medium tabular-nums">
+                                                {live?.price != null ? `$${fmt(live.price)}` : '—'}
                                             </td>
-                                            {/* Change */}
-                                            <td className={`px-4 py-3 text-right font-medium ${q?.changePercent != null ? (isPositive ? 'text-teal-400' : 'text-red-500') : 'text-gray-500'}`}>
-                                                {q?.changePercent != null
-                                                    ? `${isPositive ? '+' : ''}${q.changePercent.toFixed(2)}%`
+                                            {/* Live change */}
+                                            <td className={`px-4 py-3 text-right font-medium tabular-nums transition-colors ${
+                                                live?.changePercent != null
+                                                    ? isPositive ? 'text-teal-400' : 'text-red-500'
+                                                    : 'text-gray-500'
+                                            }`}>
+                                                {live?.changePercent != null
+                                                    ? `${isPositive ? '+' : ''}${live.changePercent.toFixed(2)}%`
                                                     : '—'}
                                             </td>
-                                            {/* Market Cap */}
+                                            {/* Static market cap */}
                                             <td className="px-4 py-3 text-right text-gray-400">
-                                                {formatMarketCap(q?.marketCap ?? null)}
+                                                {formatMarketCap(stat?.marketCap ?? null)}
                                             </td>
-                                            {/* P/E */}
+                                            {/* Static P/E */}
                                             <td className="px-4 py-3 text-right text-gray-400">
-                                                {formatPE(q?.peRatio ?? null)}
+                                                {stat?.peRatio != null ? stat.peRatio.toFixed(1) : '—'}
                                             </td>
-                                            {/* Alert */}
                                             <td className="px-4 py-3 text-center">
                                                 <button
                                                     onClick={() => setAlertTarget({ symbol: item.symbol, company: item.company })}
