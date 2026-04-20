@@ -17,7 +17,7 @@ export const sendWelcomeEmail = async ({ email, name, intro }: WelcomeEmailData)
         .replace('{{intro}}', intro);
 
     const mailOptions = {
-        from: `"AssetWatch" <assetwatch@abdsayeed>`,
+        from: `"AssetWatch" <${process.env.SMTP_FROM}>`,
         to: email,
         subject: `Welcome to AssetWatch - your stock market toolkit is ready!`,
         text: 'Thanks for joining AssetWatch',
@@ -35,7 +35,7 @@ export const sendNewsSummaryEmail = async (
         .replace('{{newsContent}}', newsContent);
 
     const mailOptions = {
-        from: `"AssetWatch News" <assetwatch@abdsayeed>`,
+        from: `"AssetWatch News" <${process.env.SMTP_FROM}>`,
         to: email,
         subject: `📈 Market News Summary Today - ${date}`,
         text: `Today's market news summary from AssetWatch`,

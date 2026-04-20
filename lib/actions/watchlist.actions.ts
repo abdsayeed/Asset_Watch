@@ -5,19 +5,20 @@ import { Watchlist } from '@/database/models/watchlist.model';
 import { auth } from '@/lib/better-auth/auth';
 import { headers } from 'next/headers';
 
-// Get all watchlist symbols for a user by email (used by inngest news email)
+// Get all watchlist symbols for a user by email (used by inngest — no request context)
 export async function getWatchlistSymbolsByEmail(email: string): Promise<string[]> {
-    await connectToDatabase();
+    const mongoose = await connectToDatabase();
+    const db = mongoose.connection.db!;
 
-    const items = await Watchlist.find({}, { symbol: 1, _id: 0 }).lean();
-    // Filter by joining with user collection via userId — for now return all symbols for the user
-    // We look up userId from the user collection first
-    const mongoose = (await connectToDatabase()).connection.db!;
-    const user = await mongoose.collection('user').findOne({ email });
+    const user = await db.collection('user').findOne({ email });
     if (!user) return [];
 
-    const watchlistItems = await Watchlist.find({ userId: user._id.toString() }, { symbol: 1, _id: 0 }).lean();
-    return watchlistItems.map((item) => item.symbol);
+    const items = await Watchlist.find(
+        { userId: user._id.toString() },
+        { symbol: 1, _id: 0 }
+    ).lean();
+
+    return items.map((item) => item.symbol);
 }
 
 // Get full watchlist for the current logged-in user

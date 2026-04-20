@@ -56,34 +56,42 @@ export async function searchStocks(query?: string): Promise<StockWithWatchlistSt
 }
 
 export async function getNews(symbols?: string[]): Promise<MarketNewsArticle[]> {
-    if (!FINNHUB_API_KEY) throw new Error('FINNHUB_API_KEY must be set in .env');
-
-    if (symbols && symbols.length > 0) {
-        const today = new Date();
-        const from = new Date(today);
-        from.setDate(from.getDate() - 7);
-        const fromStr = from.toISOString().split('T')[0];
-        const toStr = today.toISOString().split('T')[0];
-
-        const results = await Promise.all(
-            symbols.slice(0, 5).map(async (symbol) => {
-                const res = await fetch(
-                    `${BASE_URL}/company-news?symbol=${symbol}&from=${fromStr}&to=${toStr}&token=${FINNHUB_API_KEY}`,
-                    { next: { revalidate: 3600 } }
-                );
-                if (!res.ok) return [];
-                return res.json() as Promise<MarketNewsArticle[]>;
-            })
-        );
-
-        const articles = results.flat();
-        if (articles.length > 0) return articles;
+    if (!FINNHUB_API_KEY) {
+        console.warn('FINNHUB_API_KEY not set — skipping news fetch');
+        return [];
     }
 
-    const res = await fetch(
-        `${BASE_URL}/news?category=general&token=${FINNHUB_API_KEY}`,
-        { next: { revalidate: 3600 } }
-    );
-    if (!res.ok) throw new Error(`Finnhub news request failed: ${res.status}`);
-    return res.json() as Promise<MarketNewsArticle[]>;
+    try {
+        if (symbols && symbols.length > 0) {
+            const today = new Date();
+            const from = new Date(today);
+            from.setDate(from.getDate() - 7);
+            const fromStr = from.toISOString().split('T')[0];
+            const toStr = today.toISOString().split('T')[0];
+
+            const results = await Promise.all(
+                symbols.slice(0, 5).map(async (symbol) => {
+                    const res = await fetch(
+                        `${BASE_URL}/company-news?symbol=${symbol}&from=${fromStr}&to=${toStr}&token=${FINNHUB_API_KEY}`,
+                        { next: { revalidate: 3600 } }
+                    );
+                    if (!res.ok) return [];
+                    return res.json() as Promise<MarketNewsArticle[]>;
+                })
+            );
+
+            const articles = results.flat();
+            if (articles.length > 0) return articles;
+        }
+
+        const res = await fetch(
+            `${BASE_URL}/news?category=general&token=${FINNHUB_API_KEY}`,
+            { next: { revalidate: 3600 } }
+        );
+        if (!res.ok) throw new Error(`Finnhub news request failed: ${res.status}`);
+        return res.json() as Promise<MarketNewsArticle[]>;
+    } catch (error) {
+        console.error('getNews error:', error);
+        return [];
+    }
 }
