@@ -12,16 +12,14 @@ export default async function WatchlistPage() {
     ]);
 
     return (
-        <div className="flex flex-col gap-8">
-            <div className="flex flex-col lg:flex-row gap-8">
-                {/* Left: Watchlist table */}
-                <div className="flex-1 min-w-0">
-                    <WatchlistTable watchlist={watchlist} initialStocks={initialStocks} />
-                </div>
-                {/* Right: Alerts panel */}
-                <div className="w-full lg:w-[380px] shrink-0">
-                    <AlertsPanel alerts={alerts} watchlist={watchlist} />
-                </div>
+        <div className="flex flex-col lg:flex-row gap-6 items-start">
+            {/* Left: Watchlist table — takes most of the width */}
+            <div className="flex-1 min-w-0">
+                <WatchlistTable watchlist={watchlist} initialStocks={initialStocks} />
+            </div>
+            {/* Right: Alerts panel — fixed width like the screenshot */}
+            <div className="w-full lg:w-[340px] shrink-0">
+                <AlertsPanel alerts={alerts} watchlist={watchlist} />
             </div>
         </div>
     );
