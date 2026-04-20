@@ -18,18 +18,11 @@ const TradingViewWidget = ({ title, scriptUrl, config, height = 600, className }
     return (
         <div className="w-full">
             {title && <h3 className="font-semibold text-2xl text-gray-100 mb-5">{title}</h3>}
-            {/* Skeleton shown until the widget script loads */}
             <div
-                className={cn('tradingview-widget-container', className)}
                 ref={containerRef}
-                style={{ minHeight: height }}
-            >
-                {/* Placeholder skeleton */}
-                <div
-                    className="tradingview-widget-container__widget rounded-lg"
-                    style={{ height, width: '100%', backgroundColor: '#141414' }}
-                />
-            </div>
+                className={cn('tradingview-widget-container', className)}
+                style={{ minHeight: height, backgroundColor: '#141414', borderRadius: '8px', overflow: 'hidden' }}
+            />
         </div>
     );
 };

@@ -14,11 +14,11 @@ import {Button} from "@/components/ui/button";
 import {LogOut} from "lucide-react";
 import NavItems from "@/components/NavItems";
 import {signOut} from "@/lib/actions/auth.actions";
-import { getGravatarUrl } from "@/lib/gravatar";
+import { getAvatarUrl } from "@/lib/gravatar";
 
 const UserDropdown = ({ user, initialStocks }: {user: User, initialStocks: StockWithWatchlistStatus[]}) => {
     const router = useRouter();
-    const avatarUrl = getGravatarUrl(user.email, 80);
+    const avatarUrl = getAvatarUrl(user.name, user.email, 80);
 
     const handleSignOut = async () => {
         await signOut();
