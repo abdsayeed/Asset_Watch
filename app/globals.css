@@ -396,24 +396,31 @@
   overflow: hidden !important;
 }
 
-.tradingview-widget-container * {
+.tradingview-widget-container__widget {
   background-color: #141414 !important;
+  height: 100% !important;
+}
+
+.tradingview-widget-container iframe {
+  background-color: #141414 !important;
+  width: 100% !important;
+  /* Hide iframe until TradingView script sets its own dark background */
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* Once the iframe has loaded content, TradingView adds this class */
+.tradingview-widget-container iframe[src] {
+  opacity: 1;
 }
 
 .tv-embed-widget-wrapper__body {
   background-color: #141414 !important;
 }
 
-.tradingview-widget-container__widget {
+.tv-embed-widget-wrapper .tv-embed-widget-wrapper__body {
+  background: #141414 !important;
   background-color: #141414 !important;
-  height: 100% !important;
-}
-
-/* Force dark on iframes before they load */
-.tradingview-widget-container iframe {
-  background-color: #141414 !important;
-  color-scheme: dark !important;
-  width: 100% !important;
 }
 
 .widget-stock-heatmap-container .screenerMapWrapper-BBVfGP0b {
@@ -448,16 +455,6 @@
 .tradingview-widget-copyright a:hover {
   color: #93c5fd;
   text-decoration: underline;
-}
-
-.tv-embed-widget-wrapper .tv-embed-widget-wrapper__body {
-  background: #141414 !important;
-  background-color: #141414 !important;
-}
-
-.tradingview-widget-container iframe {
-  background-color: #141414 !important;
-  width: 100% !important;
 }
 
 .custom-chart.tradingview-widget-container iframe {
