@@ -4,6 +4,7 @@ import { connectToDatabase } from '@/database/mongoose';
 import { Watchlist } from '@/database/models/watchlist.model';
 import { getAuth } from '@/lib/better-auth/auth';
 import { headers } from 'next/headers';
+import { revalidatePath } from 'next/cache';
 
 // Get all watchlist symbols for a user by email (used by inngest — no request context)
 export async function getWatchlistSymbolsByEmail(email: string): Promise<string[]> {
@@ -52,6 +53,8 @@ export async function addToWatchlist(symbol: string, company: string): Promise<{
             symbol: symbol.toUpperCase(),
             company,
         });
+        revalidatePath('/');
+        revalidatePath('/watchlist');
         return { success: true, message: `${symbol} added to watchlist` };
     } catch (err: unknown) {
         // Duplicate key — already in watchlist
@@ -75,6 +78,8 @@ export async function removeFromWatchlist(symbol: string): Promise<{ success: bo
     if (result.deletedCount === 0) {
         return { success: false, message: `${symbol} not found in watchlist` };
     }
+    revalidatePath('/');
+    revalidatePath('/watchlist');
     return { success: true, message: `${symbol} removed from watchlist` };
 }
 

@@ -1,35 +1,51 @@
 'use server';
 
+import { connectToDatabase } from '@/database/mongoose';
+import { Watchlist } from '@/database/models/watchlist.model';
+import { getAuth } from '@/lib/better-auth/auth';
+import { headers } from 'next/headers';
+
 const FINNHUB_API_KEY = process.env.FINNHUB_API_KEY;
 const BASE_URL = 'https://finnhub.io/api/v1';
 
-// Static popular stocks — shown instantly with no API call needed
-const POPULAR_STOCKS: StockWithWatchlistStatus[] = [
-    { symbol: 'AAPL',  name: 'Apple Inc.',             exchange: 'NASDAQ', type: 'Common Stock', isInWatchlist: false },
-    { symbol: 'MSFT',  name: 'Microsoft Corporation',  exchange: 'NASDAQ', type: 'Common Stock', isInWatchlist: false },
-    { symbol: 'GOOGL', name: 'Alphabet Inc.',           exchange: 'NASDAQ', type: 'Common Stock', isInWatchlist: false },
-    { symbol: 'AMZN',  name: 'Amazon.com Inc.',         exchange: 'NASDAQ', type: 'Common Stock', isInWatchlist: false },
-    { symbol: 'TSLA',  name: 'Tesla Inc.',              exchange: 'NASDAQ', type: 'Common Stock', isInWatchlist: false },
-    { symbol: 'META',  name: 'Meta Platforms Inc.',     exchange: 'NASDAQ', type: 'Common Stock', isInWatchlist: false },
-    { symbol: 'NVDA',  name: 'NVIDIA Corporation',      exchange: 'NASDAQ', type: 'Common Stock', isInWatchlist: false },
-    { symbol: 'NFLX',  name: 'Netflix Inc.',            exchange: 'NASDAQ', type: 'Common Stock', isInWatchlist: false },
-    { symbol: 'ORCL',  name: 'Oracle Corporation',      exchange: 'NYSE',   type: 'Common Stock', isInWatchlist: false },
-    { symbol: 'CRM',   name: 'Salesforce Inc.',         exchange: 'NYSE',   type: 'Common Stock', isInWatchlist: false },
+const POPULAR_STOCKS: Omit<StockWithWatchlistStatus, 'isInWatchlist'>[] = [
+    { symbol: 'AAPL',  name: 'Apple Inc.',             exchange: 'NASDAQ', type: 'Common Stock' },
+    { symbol: 'MSFT',  name: 'Microsoft Corporation',  exchange: 'NASDAQ', type: 'Common Stock' },
+    { symbol: 'GOOGL', name: 'Alphabet Inc.',           exchange: 'NASDAQ', type: 'Common Stock' },
+    { symbol: 'AMZN',  name: 'Amazon.com Inc.',         exchange: 'NASDAQ', type: 'Common Stock' },
+    { symbol: 'TSLA',  name: 'Tesla Inc.',              exchange: 'NASDAQ', type: 'Common Stock' },
+    { symbol: 'META',  name: 'Meta Platforms Inc.',     exchange: 'NASDAQ', type: 'Common Stock' },
+    { symbol: 'NVDA',  name: 'NVIDIA Corporation',      exchange: 'NASDAQ', type: 'Common Stock' },
+    { symbol: 'NFLX',  name: 'Netflix Inc.',            exchange: 'NASDAQ', type: 'Common Stock' },
+    { symbol: 'ORCL',  name: 'Oracle Corporation',      exchange: 'NYSE',   type: 'Common Stock' },
+    { symbol: 'CRM',   name: 'Salesforce Inc.',         exchange: 'NYSE',   type: 'Common Stock' },
 ];
 
+async function getUserWatchlistSymbols(): Promise<Set<string>> {
+    try {
+        await connectToDatabase();
+        const auth = await getAuth();
+        const session = await auth.api.getSession({ headers: await headers() });
+        if (!session?.user) return new Set();
+        const items = await Watchlist.find({ userId: session.user.id }, { symbol: 1, _id: 0 }).lean();
+        return new Set(items.map(i => i.symbol.toUpperCase()));
+    } catch {
+        return new Set();
+    }
+}
+
 export async function searchStocks(query?: string): Promise<StockWithWatchlistStatus[]> {
-    // No query — return static list instantly, no API call needed
+    const watchlistSymbols = await getUserWatchlistSymbols();
+
     if (!query || !query.trim()) {
-        return POPULAR_STOCKS;
+        return POPULAR_STOCKS.map(s => ({ ...s, isInWatchlist: watchlistSymbols.has(s.symbol) }));
     }
 
-    // With a query — hit Finnhub search if key is available
     if (!FINNHUB_API_KEY) {
-        // Filter static list as a fallback
         const q = query.trim().toLowerCase();
-        return POPULAR_STOCKS.filter(
-            (s) => s.symbol.toLowerCase().includes(q) || s.name.toLowerCase().includes(q)
-        );
+        return POPULAR_STOCKS
+            .filter(s => s.symbol.toLowerCase().includes(q) || s.name.toLowerCase().includes(q))
+            .map(s => ({ ...s, isInWatchlist: watchlistSymbols.has(s.symbol) }));
     }
 
     try {
@@ -44,14 +60,14 @@ export async function searchStocks(query?: string): Promise<StockWithWatchlistSt
             name: item.description,
             exchange: item.displaySymbol || item.symbol,
             type: item.type,
-            isInWatchlist: false,
+            isInWatchlist: watchlistSymbols.has(item.symbol.toUpperCase()),
         }));
     } catch (error) {
         console.error('searchStocks error:', error);
         const q = query.trim().toLowerCase();
-        return POPULAR_STOCKS.filter(
-            (s) => s.symbol.toLowerCase().includes(q) || s.name.toLowerCase().includes(q)
-        );
+        return POPULAR_STOCKS
+            .filter(s => s.symbol.toLowerCase().includes(q) || s.name.toLowerCase().includes(q))
+            .map(s => ({ ...s, isInWatchlist: watchlistSymbols.has(s.symbol) }));
     }
 }
 
