@@ -404,12 +404,8 @@
 .tradingview-widget-container iframe {
   background-color: #141414 !important;
   width: 100% !important;
-  /* Hide iframe until TradingView script sets its own dark background */
-  opacity: 0;
-  transition: opacity 0.3s ease;
 }
 
-/* Once the iframe has loaded content, TradingView adds this class */
 .tradingview-widget-container iframe[src] {
   opacity: 1;
 }
