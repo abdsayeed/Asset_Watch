@@ -7,7 +7,7 @@ import { removeFromWatchlist } from '@/lib/actions/watchlist.actions';
 import { toast } from 'sonner';
 import SearchCommand from '@/components/SearchCommand';
 import AddAlertModal from '@/components/watchlist/AddAlertModal';
-import type { StockQuote } from '@/lib/actions/finnhub.actions';
+import type { StockQuote } from '@/lib/actions/quotes.actions';
 
 type WatchlistItem = {
     userId: string;

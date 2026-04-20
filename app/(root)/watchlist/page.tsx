@@ -1,6 +1,7 @@
 import { getWatchlist } from '@/lib/actions/watchlist.actions';
 import { getAlerts } from '@/lib/actions/alert.actions';
-import { searchStocks, getStockQuotes } from '@/lib/actions/finnhub.actions';
+import { searchStocks } from '@/lib/actions/finnhub.actions';
+import { getStockQuotes } from '@/lib/actions/quotes.actions';
 import WatchlistTable from '@/components/watchlist/WatchlistTable';
 import AlertsPanel from '@/components/watchlist/AlertsPanel';
 
