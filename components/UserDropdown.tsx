@@ -11,9 +11,8 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {useRouter} from "next/navigation";
 import {Button} from "@/components/ui/button";
-import {LogOut, LayoutDashboard, Star, Search} from "lucide-react";
+import {LogOut, LayoutDashboard, Star} from "lucide-react";
 import Link from "next/link";
-import NavItems from "@/components/NavItems";
 import {signOut} from "@/lib/actions/auth.actions";
 import { getAvatarUrl } from "@/lib/gravatar";
 
@@ -87,12 +86,6 @@ const UserDropdown = ({ user, initialStocks }: {user: User, initialStocks: Stock
                     <LogOut className="h-4 w-4 mr-2" />
                     Logout
                 </DropdownMenuItem>
-
-                {/* Mobile nav */}
-                <div className="sm:hidden">
-                    <DropdownMenuSeparator className="bg-gray-600"/>
-                    <NavItems initialStocks={initialStocks} />
-                </div>
             </DropdownMenuContent>
         </DropdownMenu>
     )
