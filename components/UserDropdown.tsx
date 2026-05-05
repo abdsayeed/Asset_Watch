@@ -36,13 +36,13 @@ const UserDropdown = ({ user, initialStocks }: {user: User, initialStocks: Stock
                         </AvatarFallback>
                     </Avatar>
                     <div className="hidden md:flex flex-col items-start">
-                        <span className='text-base font-medium text-gray-400'>
+                        <span className='text-base font-medium text-gray-600'>
                             {user.name}
                         </span>
                     </div>
                 </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="text-gray-400 bg-gray-800 border-gray-600 min-w-[240px] mt-2">
+            <DropdownMenuContent className="text-gray-600 bg-white border-gray-200 shadow-md min-w-[240px] mt-2">
                 {/* User info */}
                 <DropdownMenuLabel>
                     <div className="flex items-center gap-3 py-2">
@@ -53,35 +53,35 @@ const UserDropdown = ({ user, initialStocks }: {user: User, initialStocks: Stock
                             </AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col">
-                            <span className='text-base font-medium text-gray-100'>{user.name}</span>
-                            <span className="text-sm text-gray-500">{user.email}</span>
+                            <span className='text-base font-medium text-gray-800'>{user.name}</span>
+                            <span className="text-sm text-gray-400">{user.email}</span>
                         </div>
                     </div>
                 </DropdownMenuLabel>
 
-                <DropdownMenuSeparator className="bg-gray-600"/>
+                <DropdownMenuSeparator className="bg-gray-100"/>
 
                 {/* Navigation links */}
-                <DropdownMenuItem asChild className="text-gray-300 hover:text-yellow-500 focus:bg-gray-700 focus:text-yellow-500 cursor-pointer">
+                <DropdownMenuItem asChild className="text-gray-600 hover:text-yellow-500 focus:bg-gray-50 focus:text-yellow-500 cursor-pointer">
                     <Link href="/" className="flex items-center gap-2 px-2 py-2">
                         <LayoutDashboard className="h-4 w-4" />
                         Dashboard
                     </Link>
                 </DropdownMenuItem>
 
-                <DropdownMenuItem asChild className="text-gray-300 hover:text-yellow-500 focus:bg-gray-700 focus:text-yellow-500 cursor-pointer">
+                <DropdownMenuItem asChild className="text-gray-600 hover:text-yellow-500 focus:bg-gray-50 focus:text-yellow-500 cursor-pointer">
                     <Link href="/watchlist" className="flex items-center gap-2 px-2 py-2">
                         <Star className="h-4 w-4" />
                         Watchlist
                     </Link>
                 </DropdownMenuItem>
 
-                <DropdownMenuSeparator className="bg-gray-600"/>
+                <DropdownMenuSeparator className="bg-gray-100"/>
 
                 {/* Logout */}
                 <DropdownMenuItem
                     onClick={handleSignOut}
-                    className="text-gray-300 hover:text-red-400 focus:bg-gray-700 focus:text-red-400 cursor-pointer"
+                    className="text-gray-600 hover:text-red-400 focus:bg-gray-50 focus:text-red-400 cursor-pointer"
                 >
                     <LogOut className="h-4 w-4 mr-2" />
                     Logout

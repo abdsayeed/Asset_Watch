@@ -20,7 +20,7 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
                         alt="AssetWatch logo"
                         width={300}
                         height={80}
-                        className="h-16 w-auto brightness-0 invert"
+                        className="h-16 w-auto"
                     />
                 </Link>
                 <div className="pb-6 lg:pb-8 flex-1">{children}</div>

@@ -29,7 +29,7 @@ const NavItems = ({initialStocks}: { initialStocks: StockWithWatchlistStatus[]})
 
                 return <li key={href}>
                     <Link href={href} className={`hover:text-yellow-500 transition-colors ${
-                        isActive(href) ? 'text-gray-100' : ''
+                        isActive(href) ? 'text-gray-800 font-semibold' : 'text-gray-500'
                     }`}>
                         {label}
                     </Link>

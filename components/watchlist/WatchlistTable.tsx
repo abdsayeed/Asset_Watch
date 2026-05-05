@@ -24,9 +24,9 @@ function fmt(v: number | null) {
 }
 function formatMarketCap(v: number | null) {
     if (v === null) return '—';
-    if (v >= 1_000_000) return `$${(v / 1_000_000).toFixed(2)}T`;
-    if (v >= 1_000) return `$${(v / 1_000).toFixed(2)}B`;
-    return `$${v.toFixed(0)}M`;
+    if (v >= 1_000_000) return `${(v / 1_000_000).toFixed(2)}T`;
+    if (v >= 1_000) return `${(v / 1_000).toFixed(2)}B`;
+    return `${v.toFixed(0)}M`;
 }
 
 const POLL_INTERVAL = 15_000;
@@ -75,14 +75,14 @@ export default function WatchlistTable({ watchlist: initial, quotes: initialQuot
 
     return (
         <>
-            <div className="bg-gray-800 border border-gray-600 rounded-xl overflow-hidden">
+            <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
                 {/* Header */}
-                <div className="flex items-center justify-between px-4 md:px-6 py-4 border-b border-gray-600">
+                <div className="flex items-center justify-between px-4 md:px-6 py-4 border-b border-gray-100">
                     <div className="flex items-center gap-2 md:gap-3 min-w-0">
-                        <h2 className="text-lg md:text-xl font-bold text-gray-100 shrink-0">Watchlist</h2>
+                        <h2 className="text-lg md:text-xl font-bold text-gray-800 shrink-0">Watchlist</h2>
                         {watchlist.length > 0 && (
-                            <div className="hidden sm:flex items-center gap-1.5 text-xs text-gray-500">
-                                <RefreshCw className={`h-3 w-3 ${refreshing ? 'animate-spin text-yellow-400' : ''}`} />
+                            <div className="hidden sm:flex items-center gap-1.5 text-xs text-gray-400">
+                                <RefreshCw className={`h-3 w-3 ${refreshing ? 'animate-spin text-yellow-500' : ''}`} />
                                 <span>{refreshing ? 'Updating...' : `${lastUpdated.toLocaleTimeString()}`}</span>
                             </div>
                         )}
@@ -92,15 +92,15 @@ export default function WatchlistTable({ watchlist: initial, quotes: initialQuot
 
                 {watchlist.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-16 text-center px-6">
-                        <Star className="h-10 w-10 text-gray-600 mb-3" />
-                        <p className="text-gray-400 font-medium mb-1">Your watchlist is empty</p>
-                        <p className="text-gray-500 text-sm mb-4">Search for stocks and click ★ to add them</p>
+                        <Star className="h-10 w-10 text-gray-300 mb-3" />
+                        <p className="text-gray-500 font-medium mb-1">Your watchlist is empty</p>
+                        <p className="text-gray-400 text-sm mb-4">Search for stocks and click ★ to add them</p>
                         <SearchCommand renderAs="button" label="Search Stocks" initialStocks={initialStocks} />
                     </div>
                 ) : (
                     <>
                         {/* ── Mobile: card rows ── */}
-                        <div className="md:hidden divide-y divide-gray-700">
+                        <div className="md:hidden divide-y divide-gray-100">
                             {watchlist.map(item => {
                                 const live = liveQuotes.get(item.symbol);
                                 const isPos = (live?.changePercent ?? 0) >= 0;
@@ -111,24 +111,24 @@ export default function WatchlistTable({ watchlist: initial, quotes: initialQuot
                                                 <Star className="h-4 w-4 fill-yellow-400" />
                                             </button>
                                             <div className="min-w-0">
-                                                <Link href={`/stocks/${item.symbol}`} className="text-gray-200 hover:text-yellow-400 font-medium text-sm truncate block">
+                                                <Link href={`/stocks/${item.symbol}`} className="text-gray-700 hover:text-yellow-500 font-medium text-sm truncate block">
                                                     {item.company}
                                                 </Link>
-                                                <span className="text-gray-500 text-xs font-mono">{item.symbol}</span>
+                                                <span className="text-gray-400 text-xs font-mono">{item.symbol}</span>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-2 shrink-0">
                                             <div className="text-right">
-                                                <div className="text-gray-100 font-medium text-sm tabular-nums">
-                                                    {live?.price != null ? `$${fmt(live.price)}` : '—'}
+                                                <div className="text-gray-800 font-medium text-sm tabular-nums">
+                                                    {live?.price != null ? `${fmt(live.price)}` : '—'}
                                                 </div>
-                                                <div className={`text-xs tabular-nums ${live?.changePercent != null ? (isPos ? 'text-teal-400' : 'text-red-500') : 'text-gray-500'}`}>
+                                                <div className={`text-xs tabular-nums ${live?.changePercent != null ? (isPos ? 'text-teal-600' : 'text-red-500') : 'text-gray-400'}`}>
                                                     {live?.changePercent != null ? `${isPos ? '+' : ''}${live.changePercent.toFixed(2)}%` : '—'}
                                                 </div>
                                             </div>
                                             <button
                                                 onClick={() => setAlertTarget({ symbol: item.symbol, company: item.company })}
-                                                className="px-2 py-1 bg-orange-500/20 text-orange-400 text-xs font-medium rounded border border-orange-500/30 shrink-0"
+                                                className="px-2 py-1 bg-orange-50 text-orange-500 text-xs font-medium rounded border border-orange-200 shrink-0"
                                             >
                                                 Alert
                                             </button>
@@ -142,7 +142,7 @@ export default function WatchlistTable({ watchlist: initial, quotes: initialQuot
                         <div className="hidden md:block overflow-x-auto">
                             <table className="w-full text-sm">
                                 <thead>
-                                    <tr className="border-b border-gray-700 text-gray-500 text-xs uppercase tracking-wider">
+                                    <tr className="border-b border-gray-100 text-gray-400 text-xs uppercase tracking-wider bg-gray-50">
                                         <th className="text-left px-4 py-3 w-8"></th>
                                         <th className="text-left px-2 py-3">Company</th>
                                         <th className="text-left px-4 py-3">Symbol</th>
@@ -159,30 +159,30 @@ export default function WatchlistTable({ watchlist: initial, quotes: initialQuot
                                         const stat = staticMap.get(item.symbol);
                                         const isPos = (live?.changePercent ?? 0) >= 0;
                                         return (
-                                            <tr key={item.symbol} className="border-b border-gray-700 hover:bg-gray-700/30 transition-colors">
+                                            <tr key={item.symbol} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
                                                 <td className="px-4 py-3">
-                                                    <button onClick={() => handleRemove(item.symbol)} className="text-yellow-400 hover:text-gray-500 transition-colors">
+                                                    <button onClick={() => handleRemove(item.symbol)} className="text-yellow-400 hover:text-gray-400 transition-colors">
                                                         <Star className="h-4 w-4 fill-yellow-400" />
                                                     </button>
                                                 </td>
                                                 <td className="px-2 py-3">
-                                                    <Link href={`/stocks/${item.symbol}`} className="text-gray-200 hover:text-yellow-400 font-medium">
+                                                    <Link href={`/stocks/${item.symbol}`} className="text-gray-700 hover:text-yellow-500 font-medium">
                                                         {item.company}
                                                     </Link>
                                                 </td>
                                                 <td className="px-4 py-3 text-gray-400 font-mono">{item.symbol}</td>
-                                                <td className="px-4 py-3 text-right text-gray-100 font-medium tabular-nums">
-                                                    {live?.price != null ? `$${fmt(live.price)}` : '—'}
+                                                <td className="px-4 py-3 text-right text-gray-800 font-medium tabular-nums">
+                                                    {live?.price != null ? `${fmt(live.price)}` : '—'}
                                                 </td>
-                                                <td className={`px-4 py-3 text-right font-medium tabular-nums ${live?.changePercent != null ? (isPos ? 'text-teal-400' : 'text-red-500') : 'text-gray-500'}`}>
+                                                <td className={`px-4 py-3 text-right font-medium tabular-nums ${live?.changePercent != null ? (isPos ? 'text-teal-600' : 'text-red-500') : 'text-gray-400'}`}>
                                                     {live?.changePercent != null ? `${isPos ? '+' : ''}${live.changePercent.toFixed(2)}%` : '—'}
                                                 </td>
-                                                <td className="px-4 py-3 text-right text-gray-400">{formatMarketCap(stat?.marketCap ?? null)}</td>
-                                                <td className="px-4 py-3 text-right text-gray-400">{stat?.peRatio != null ? stat.peRatio.toFixed(1) : '—'}</td>
+                                                <td className="px-4 py-3 text-right text-gray-500">{formatMarketCap(stat?.marketCap ?? null)}</td>
+                                                <td className="px-4 py-3 text-right text-gray-500">{stat?.peRatio != null ? stat.peRatio.toFixed(1) : '—'}</td>
                                                 <td className="px-4 py-3 text-center">
                                                     <button
                                                         onClick={() => setAlertTarget({ symbol: item.symbol, company: item.company })}
-                                                        className="px-3 py-1 bg-orange-500/20 hover:bg-orange-500/30 text-orange-400 text-xs font-medium rounded border border-orange-500/30"
+                                                        className="px-3 py-1 bg-orange-50 hover:bg-orange-100 text-orange-500 text-xs font-medium rounded border border-orange-200"
                                                     >
                                                         Add Alert
                                                     </button>

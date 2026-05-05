@@ -62,10 +62,10 @@ export default function AlertsPanel({ alerts: initial, watchlist }: Props) {
 
     return (
         <>
-            <div className="bg-gray-800 border border-gray-600 rounded-xl overflow-hidden h-full">
+            <div className="bg-white border border-gray-200 rounded-xl overflow-hidden h-full shadow-sm">
                 {/* Header */}
-                <div className="flex items-center justify-between px-5 py-4 border-b border-gray-600">
-                    <h2 className="text-xl font-bold text-gray-100">Alerts</h2>
+                <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                    <h2 className="text-xl font-bold text-gray-800">Alerts</h2>
                     <button
                         onClick={() => {
                             const first = watchlist[0];
@@ -79,14 +79,14 @@ export default function AlertsPanel({ alerts: initial, watchlist }: Props) {
                 </div>
 
                 {/* Alert cards */}
-                <div className="overflow-y-auto max-h-[calc(100vh-200px)] divide-y divide-gray-700">
+                <div className="overflow-y-auto max-h-[calc(100vh-200px)] divide-y divide-gray-100">
                     {grouped.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-16 text-center px-5">
-                            <div className="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center mb-4">
-                                <Plus className="h-6 w-6 text-gray-500" />
+                            <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                                <Plus className="h-6 w-6 text-gray-400" />
                             </div>
-                            <p className="text-gray-400 font-medium mb-1">No alerts yet</p>
-                            <p className="text-gray-500 text-sm">Click "Add Alert" next to any stock to get notified</p>
+                            <p className="text-gray-500 font-medium mb-1">No alerts yet</p>
+                            <p className="text-gray-400 text-sm">Click "Add Alert" next to any stock to get notified</p>
                         </div>
                     ) : (
                         grouped.map(([symbol, { company, alerts: stockAlerts }]) => (
@@ -133,18 +133,18 @@ function AlertCard({
             <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-3">
                     {/* Logo placeholder */}
-                    <div className="w-10 h-10 rounded-full bg-gray-700 border border-gray-600 flex items-center justify-center text-sm font-bold text-yellow-400 shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-sm font-bold text-yellow-500 shrink-0">
                         {symbol.slice(0, 2)}
                     </div>
                     <div>
-                        <div className="text-gray-100 font-semibold text-sm leading-tight">{company}</div>
-                        <div className="text-gray-500 text-xs">{symbol}</div>
+                        <div className="text-gray-800 font-semibold text-sm leading-tight">{company}</div>
+                        <div className="text-gray-400 text-xs">{symbol}</div>
                     </div>
                 </div>
                 {/* Price placeholder — would need live data */}
                 <div className="text-right">
-                    <div className="text-gray-200 font-semibold text-sm">—</div>
-                    <div className="text-gray-500 text-xs">—</div>
+                    <div className="text-gray-700 font-semibold text-sm">—</div>
+                    <div className="text-gray-400 text-xs">—</div>
                 </div>
             </div>
 
@@ -152,30 +152,30 @@ function AlertCard({
             {alerts.map((alert) => (
                 <div key={alert.id} className="mt-2">
                     <div className="flex items-center justify-between">
-                        <span className="text-xs text-gray-500">Alert:</span>
+                        <span className="text-xs text-gray-400">Alert:</span>
                         <div className="flex items-center gap-1.5">
                             <button
                                 onClick={() => onEdit(symbol, company)}
-                                className="p-1 rounded hover:bg-gray-700 text-gray-500 hover:text-gray-300 transition-colors"
+                                className="p-1 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
                             >
                                 <Pencil className="h-3 w-3" />
                             </button>
                             <button
                                 onClick={() => onDelete(alert.id)}
-                                className="p-1 rounded hover:bg-red-500/20 text-gray-500 hover:text-red-400 transition-colors"
+                                className="p-1 rounded hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors"
                             >
                                 <Trash2 className="h-3 w-3" />
                             </button>
                         </div>
                     </div>
                     <div className="flex items-center justify-between mt-1">
-                        <span className="text-gray-200 font-semibold text-sm">
+                        <span className="text-gray-700 font-semibold text-sm">
                             Price {alert.alertType === 'upper' ? '>' : '<'} ${alert.threshold.toFixed(2)}
                         </span>
                         <span className={`text-xs px-2 py-0.5 rounded font-medium ${
                             alert.triggered
-                                ? 'bg-green-500/20 text-green-400'
-                                : 'bg-yellow-500/15 text-yellow-500'
+                                ? 'bg-green-100 text-green-600'
+                                : 'bg-yellow-50 text-yellow-600'
                         }`}>
                             {alert.triggered ? 'Triggered' : 'Active'}
                         </span>
